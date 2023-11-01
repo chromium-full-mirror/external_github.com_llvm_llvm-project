@@ -632,6 +632,22 @@ Bug Fixes to C++ Support
   (`#46200 <https://github.com/llvm/llvm-project/issues/46200>`_)
   (`#57812 <https://github.com/llvm/llvm-project/issues/57812>`_)
 
+- Diagnose use of a variable-length array in a coroutine. The design of
+  coroutines is such that it is not possible to support VLA use. Fixes:
+  (`#65858 <https://github.com/llvm/llvm-project/issues/65858>`_)
+
+- Fix bug where we were overriding zero-initialization of class members when
+  default initializing a base class in a constant expression context. Fixes:
+  (`#69890 <https://github.com/llvm/llvm-project/issues/69890>`_)
+
+- Fix crash when template class static member imported to other translation unit.
+  Fixes:
+  (`#68769 <https://github.com/llvm/llvm-project/issues/68769>`_)
+
+- Clang now defers the instantiation of explicit specifier until constraint checking
+  completes (except deduction guides). Fixes:
+  (`#59827 <https://github.com/llvm/llvm-project/issues/59827>`_)
+
 Bug Fixes to AST Handling
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 - Fixed an import failure of recursive friend class template.
