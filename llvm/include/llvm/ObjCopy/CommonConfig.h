@@ -216,6 +216,7 @@ struct CommonConfig {
   std::optional<StringRef> ExtractPartition;
   StringRef SplitDWO;
   StringRef SymbolsPrefix;
+  StringRef SymbolsPrefixRemove;
   StringRef AllocSectionsPrefix;
   DiscardType DiscardMode = DiscardType::None;
 
