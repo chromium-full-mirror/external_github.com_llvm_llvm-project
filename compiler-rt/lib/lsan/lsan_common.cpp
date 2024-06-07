@@ -12,6 +12,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "lsan_common.h"
+#include "lsan_default_suppression.h"
 
 #include "sanitizer_common/sanitizer_common.h"
 #include "sanitizer_common/sanitizer_flag_parser.h"
@@ -147,6 +148,8 @@ void LeakSuppressionContext::LazyInit() {
     if (&__lsan_default_suppressions)
       context.Parse(__lsan_default_suppressions());
     context.Parse(kStdSuppressions);
+    context.Parse(kLSanDefaultSuppressions);
+
     if (flags()->use_tls && flags()->use_ld_allocations)
       suppress_module = GetLinker();
   }
