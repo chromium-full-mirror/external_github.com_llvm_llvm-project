@@ -170,7 +170,7 @@ COMMON_FLAG(const char *, cov_pcs_out, "",
 COMMON_FLAG(bool, full_address_space, false,
             "Sanitize complete address space; "
             "by default kernel area on 32-bit platforms will not be sanitized")
-COMMON_FLAG(bool, print_suppressions, true,
+COMMON_FLAG(bool, print_suppressions, false,
             "Print matched suppressions at exit.")
 COMMON_FLAG(
     bool, disable_coredump, (SANITIZER_WORDSIZE == 64) && !SANITIZER_GO,
