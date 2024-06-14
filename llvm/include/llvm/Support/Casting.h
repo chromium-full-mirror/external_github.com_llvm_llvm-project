@@ -557,25 +557,21 @@ template <typename... To, typename From>
 
 template <typename To, typename From>
 [[nodiscard]] inline decltype(auto) cast(const From &Val) {
-  assert(isa<To>(Val) && "cast<Ty>() argument of incompatible type!");
   return CastInfo<To, const From>::doCast(Val);
 }
 
 template <typename To, typename From>
 [[nodiscard]] inline decltype(auto) cast(From &Val) {
-  assert(isa<To>(Val) && "cast<Ty>() argument of incompatible type!");
   return CastInfo<To, From>::doCast(Val);
 }
 
 template <typename To, typename From>
 [[nodiscard]] inline decltype(auto) cast(From *Val) {
-  assert(isa<To>(Val) && "cast<Ty>() argument of incompatible type!");
   return CastInfo<To, From *>::doCast(Val);
 }
 
 template <typename To, typename From>
 [[nodiscard]] inline decltype(auto) cast(std::unique_ptr<From> &&Val) {
-  assert(isa<To>(Val) && "cast<Ty>() argument of incompatible type!");
   return CastInfo<To, std::unique_ptr<From>>::doCast(std::move(Val));
 }
 
