@@ -31,6 +31,7 @@ static void err(const Twine &s) { llvm::errs() << s << "\n"; }
 static Flavor getFlavor(StringRef s) {
   return StringSwitch<Flavor>(s)
       .CasesLower({"ld", "ld.lld", "gnu"}, Gnu)
+      .CasesLower({"lld.elf", "lld.real", "lld.real.elf"}, Gnu)
       .CasesLower({"wasm", "ld-wasm"}, Wasm)
       .CaseLower("link", WinLink)
       .CasesLower({"ld64", "ld64.lld", "darwin"}, Darwin)
