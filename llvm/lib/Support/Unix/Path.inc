@@ -253,7 +253,7 @@ std::string getMainExecutable(const char *argv0, void *MainAddr) {
 #elif defined(__linux__) || defined(__CYGWIN__) || defined(__gnu_hurd__)
   char exe_path[PATH_MAX];
   const char *aPath = "/proc/self/exe";
-  if (sys::fs::exists(aPath)) {
+  if (false && sys::fs::exists(aPath)) {
     // /proc is not always mounted under Linux (chroot for example).
     ssize_t len = readlink(aPath, exe_path, sizeof(exe_path));
     if (len < 0)
