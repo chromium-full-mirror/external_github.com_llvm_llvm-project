@@ -323,6 +323,9 @@ int clang_main(int Argc, char **Argv, const llvm::ToolContext &ToolContext) {
   }
 
   std::string Path = GetExecutablePath(ToolContext.Path, CanonicalPrefixes);
+  size_t PathLen = Path.length();
+  if (PathLen > 4 && Path.substr(PathLen - 4) == ".elf")
+    Path = Path.substr(0, PathLen - 4);
 
   // Whether the cc1 tool should be called inside the current process, or if we
   // should spawn a new clang subprocess (old behavior).
