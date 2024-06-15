@@ -897,7 +897,6 @@ endif()
 # TODO: COMPILER_RT_BUILD_CRT used to be a cached variable so we need to unset
 # it first so cmake_dependent_option can set the local variable of the same
 # name. This statement can be removed in the future.
-unset(COMPILER_RT_BUILD_CRT CACHE)
 
 cmake_dependent_option(COMPILER_RT_BUILD_CRT "Build crtbegin.o/crtend.o" ON "COMPILER_RT_HAS_CRT" OFF)
 
