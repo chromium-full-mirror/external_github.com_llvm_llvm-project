@@ -30,6 +30,12 @@
 #define SCUDO_ANDROID 0
 #endif
 
+#if defined(USE_CHROMEOS_CONFIG)
+#define SCUDO_CHROMEOS 1
+#else
+#define SCUDO_CHROMEOS 0
+#endif
+
 #if defined(__Fuchsia__)
 #define SCUDO_FUCHSIA 1
 #else
