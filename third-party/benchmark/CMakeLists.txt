@@ -99,8 +99,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 
 # Read the git tags to determine the project version
-include(GetGitVersion)
-get_git_version(GIT_VERSION)
+#include(GetGitVersion)
+#get_git_version(GIT_VERSION)
+set(GIT_VERSION "0.0.0")
 
 # If no git version can be determined, use the version
 # from the project() command
