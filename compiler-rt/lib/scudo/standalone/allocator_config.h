@@ -204,6 +204,55 @@ struct AndroidConfig {
   template <typename Config> using SecondaryT = MapAllocator<Config>;
 };
 
+struct ChromeOSConfig {
+  static const bool MaySupportMemoryTagging = false;
+  template <class A>
+  using TSDRegistryT = TSDRegistryExT<A>; // Exclusive
+
+  // TODO: Retune configs with more experimentation.
+  struct Primary {
+    using SizeClassMap = DefaultSizeClassMap;
+#if SCUDO_CAN_USE_PRIMARY64
+    static const uptr RegionSizeLog = 29U;
+    static const uptr GroupSizeLog = 20U;
+    typedef uptr CompactPtrT;
+    static const uptr CompactPtrScale = 0;
+    static const bool EnableRandomOffset = true;
+    static const uptr MapSizeIncrement = 1UL << 18;
+#else
+    static const uptr RegionSizeLog = 19U;
+    static const uptr GroupSizeLog = 19U;
+    typedef uptr CompactPtrT;
+#endif
+    static const s32 MinReleaseToOsIntervalMs = INT32_MIN;
+    static const s32 MaxReleaseToOsIntervalMs = INT32_MAX;
+  };
+
+#if SCUDO_CAN_USE_PRIMARY64
+  template <typename Config>
+  using PrimaryT = SizeClassAllocator64<Config>;
+#else
+  template <typename Config>
+  using PrimaryT = SizeClassAllocator32<Config>;
+#endif
+
+  struct Secondary {
+    struct Cache {
+      static const u32 EntriesArraySize = 32U;
+      static const u32 QuarantineSize = 0U;
+      static const u32 DefaultMaxEntriesCount = 32U;
+      static const uptr DefaultMaxEntrySize = 1UL << 19;
+      static const s32 MinReleaseToOsIntervalMs = INT32_MIN;
+      static const s32 MaxReleaseToOsIntervalMs = INT32_MAX;
+    };
+    template <typename Config>
+    using CacheT = MapAllocatorCache<Config>;
+  };
+
+  template <typename Config>
+  using SecondaryT = MapAllocator<Config>;
+};
+
 #if SCUDO_CAN_USE_PRIMARY64
 struct FuchsiaConfig {
   static const bool MaySupportMemoryTagging = false;
@@ -265,6 +314,8 @@ struct TrustyConfig {
 
 #if SCUDO_ANDROID
 typedef AndroidConfig Config;
+#elif SCUDO_CHROMEOS
+typedef ChromeOSConfig Config;
 #elif SCUDO_FUCHSIA
 typedef FuchsiaConfig Config;
 #elif SCUDO_TRUSTY
