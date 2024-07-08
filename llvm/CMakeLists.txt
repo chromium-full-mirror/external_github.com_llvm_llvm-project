@@ -1364,3 +1364,6 @@ endif()
 if (LLVM_INCLUDE_UTILS AND LLVM_INCLUDE_TOOLS)
   add_subdirectory(utils/llvm-locstats)
 endif()
+
+# HACK from llvm_project_base_commit.py:
+# <<< Gentoo configuration >>>
