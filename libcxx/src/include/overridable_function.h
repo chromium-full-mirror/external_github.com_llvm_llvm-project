@@ -63,7 +63,14 @@
 // want to be defining special sections inside user's executables which use our headers.
 //
 
-#if defined(_LIBCPP_OBJECT_FORMAT_MACHO)
+// Baremetal targets tend to use custom linker scripts, which may not include
+// the __lcxx_override section.
+#if defined(LIBCXXABI_BAREMETAL)
+
+#  define _LIBCPP_CAN_DETECT_OVERRIDDEN_FUNCTION 0
+#  define _LIBCPP_MAKE_OVERRIDABLE_FUNCTION_DETECTABLE /* nothing */
+
+#elif defined(_LIBCPP_OBJECT_FORMAT_MACHO)
 
 #  define _LIBCPP_CAN_DETECT_OVERRIDDEN_FUNCTION 1
 #  define _LIBCPP_MAKE_OVERRIDABLE_FUNCTION_DETECTABLE                                                                 \
