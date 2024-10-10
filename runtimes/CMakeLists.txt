@@ -316,3 +316,6 @@ if(SUB_COMPONENTS)
       ${LLVM_BINARY_DIR}/runtimes/Components.cmake)
   endif()
 endif()
+
+# HACK from llvm_project_base_commit.py:
+# <<< Gentoo configuration >>>
