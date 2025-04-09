@@ -82,6 +82,7 @@
 #include "llvm/Option/OptTable.h"
 #include "llvm/Option/Option.h"
 #include "llvm/Support/CommandLine.h"
+#include "llvm/Support/ChromeOSUserEnum.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/ExitCodes.h"
 #include "llvm/Support/FileSystem.h"
@@ -1484,6 +1485,14 @@ bool Driver::loadDefaultConfigFiles(llvm::cl::ExpansionContext &ExpCtx) {
 
 Compilation *Driver::BuildCompilation(ArrayRef<const char *> ArgList) {
   llvm::PrettyStackTraceString CrashInfo("Compilation construction");
+
+  if (chromeos_user_enum::shouldCheckForCmdlineFlag()) {
+    StringRef AckFlag = "-D_CROSTC_IS_AWARE_OF_THIS_USECASE";
+    bool HasAckFlag =
+        llvm::any_of(ArgList, [&](const char *A) { return AckFlag == A; });
+    if (!HasAckFlag)
+      chromeos_user_enum::complainAboutNoAckAndDie(AckFlag);
+  }
 
   // FIXME: Handle environment options which affect driver behavior, somewhere
   // (client?). GCC_EXEC_PREFIX, LPATH, CC_PRINT_OPTIONS.
