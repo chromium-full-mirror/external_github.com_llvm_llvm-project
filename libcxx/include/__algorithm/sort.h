@@ -858,6 +858,7 @@ extern template _LIBCPP_EXPORTED_FROM_ABI void
 __sort<__less<long double>&, long double*>(long double*, long double*, __less<long double>&);
 
 template <class _AlgPolicy, class _RandomAccessIterator, class _Comp>
+__attribute__((no_sanitize("unsigned-integer-overflow")))
 _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 void
 __sort_dispatch(_RandomAccessIterator __first, _RandomAccessIterator __last, _Comp& __comp) {
   if (__first == __last) // log(0) is undefined, so don't try computing the depth
