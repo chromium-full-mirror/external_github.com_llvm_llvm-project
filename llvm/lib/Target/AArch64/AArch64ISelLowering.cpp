@@ -8589,6 +8589,7 @@ bool AArch64TargetLowering::isEligibleForTailCallOptimization(
   SMECallAttrs CallAttrs = getSMECallAttrs(CallerF, CLI);
   if (CallAttrs.requiresSMChange() || CallAttrs.requiresLazySave() ||
       CallAttrs.requiresPreservingAllZAState() ||
+      CallAttrs.requiresPreservingZT0() ||
       CallAttrs.caller().hasStreamingBody())
     return false;
 
