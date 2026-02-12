@@ -255,6 +255,8 @@ namespace std {
 
 */
 
+#include <stdio.h>
+
 #if __cplusplus < 201103L && defined(_LIBCPP_USE_FROZEN_CXX03_HEADERS)
 #  include <__cxx03/__config>
 #else
@@ -496,31 +498,55 @@ struct __optional_storage_base : __optional_destruct_base<_Tp> {
   // [optional.observe]
   _LIBCPP_HIDE_FROM_ABI constexpr add_pointer_t<_Tp const> operator->() const noexcept {
     _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(this->has_value(), "optional operator-> called on a disengaged value");
+    if (!this->has_value()) {
+      fprintf(stderr, "optional operator-> called on a disengaged value\n");
+      __builtin_trap();
+    }
     return std::addressof(this->__get());
   }
 
   _LIBCPP_HIDE_FROM_ABI constexpr add_pointer_t<_Tp> operator->() noexcept {
     _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(this->has_value(), "optional operator-> called on a disengaged value");
+    if (!this->has_value()) {
+      fprintf(stderr, "optional operator-> called on a disengaged value\n");
+      __builtin_trap();
+    }
     return std::addressof(this->__get());
   }
 
   [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr const _Tp& operator*() const& noexcept {
     _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(this->has_value(), "optional operator* called on a disengaged value");
+    if (!this->has_value()) {
+      fprintf(stderr, "optional operator* called on a disengaged value\n");
+      __builtin_trap();
+    }
     return this->__get();
   }
 
   [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr _Tp& operator*() & noexcept {
     _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(this->has_value(), "optional operator* called on a disengaged value");
+    if (!this->has_value()) {
+      fprintf(stderr, "optional operator* called on a disengaged value\n");
+      __builtin_trap();
+    }
     return this->__get();
   }
 
   [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr _Tp&& operator*() && noexcept {
     _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(this->has_value(), "optional operator* called on a disengaged value");
+    if (!this->has_value()) {
+      fprintf(stderr, "optional operator* called on a disengaged value\n");
+      __builtin_trap();
+    }
     return std::move(this->__get());
   }
 
   [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr const _Tp&& operator*() const&& noexcept {
     _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(this->has_value(), "optional operator* called on a disengaged value");
+    if (!this->has_value()) {
+      fprintf(stderr, "optional operator* called on a disengaged value\n");
+      __builtin_trap();
+    }
     return std::move(this->__get());
   }
 
