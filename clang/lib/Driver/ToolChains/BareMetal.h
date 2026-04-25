@@ -39,6 +39,7 @@ public:
   bool initGCCInstallation(const llvm::Triple &Triple,
                            const llvm::opt::ArgList &Args);
   bool hasValidGCCInstallation() const { return IsGCCInstallationValid; }
+  bool isGCCToolchainAdjacent() const { return IsGCCToolchainAdjacent; }
   bool isBareMetal() const override { return true; }
   bool isCrossCompiling() const override { return true; }
   bool HasNativeLLVMSupport() const override { return true; }
@@ -89,6 +90,7 @@ private:
 
   std::string SysRoot;
 
+  bool IsGCCToolchainAdjacent;
   bool IsGCCInstallationValid;
 
   SmallVector<std::string> MultilibMacroDefines;
