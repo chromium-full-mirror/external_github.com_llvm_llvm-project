@@ -143,25 +143,28 @@ bool BareMetal::initGCCInstallation(const llvm::Triple &Triple,
 }
 
 // This logic is adapted from RISCVToolChain.cpp as part of the ongoing effort
-// to merge RISCVToolChain into the Baremetal toolchain. It infers the presence
+// to merge RISCVToolChain into the Baremetal toolchain.
+// By default, this function just returns false. However, if
+// -fexperimental-gccadjacent is passed, it infers the presence
 // of a valid GCC toolchain by checking whether the `crt0.o` file exists in the
 // `bin/../<target-triple>/lib` directory.
-static bool detectGCCToolchainAdjacent(const Driver &D) {
+static bool detectGCCToolchainAdjacent(const Driver &D,
+                                       const llvm::opt::ArgList &Args) {
+  if (!Args.hasArg(options::OPT_fexperimental_gccadjacent))
+    return false;
   SmallString<128> GCCDir;
   llvm::sys::path::append(GCCDir, D.Dir, "..", D.getTargetTriple(),
                           "lib/crt0.o");
   return llvm::sys::fs::exists(GCCDir);
 }
 
-// If no sysroot is provided the driver will first attempt to infer it from the
-// values of `--gcc-install-dir` or `--gcc-toolchain`, which specify the
-// location of a GCC toolchain.
-// If neither flag is used, the sysroot defaults to either:
+// If no sysroot is provided, the driver will look for clang-runtimes first
+// unless clang is passed --gcc-install-dir, --gcc-toolchain, or the
+// -fexperimental-gccadjacent flags.
+// If no flag is used, the sysroot defaults to either:
 //    - `bin/../<target-triple>`
 //    - `bin/../lib/clang-runtimes/<target-triple>`
 //
-// To use the `clang-runtimes` path, ensure that `../<target-triple>/lib/crt0.o`
-// does not exist relative to the driver.
 std::string BareMetal::computeSysRoot() const {
   // Use Baremetal::sysroot if it has already been set.
   if (!SysRoot.empty())
@@ -179,7 +182,7 @@ std::string BareMetal::computeSysRoot() const {
   if (IsGCCInstallationValid) {
     llvm::sys::path::append(inferredSysRoot, GCCInstallation.getParentLibPath(),
                             "..", GCCInstallation.getTriple().str());
-  } else if (detectGCCToolchainAdjacent(D)) {
+  } else if (IsGCCToolchainAdjacent) {
     // Use the triple as provided to the driver. Unlike the parsed triple
     // this has not been normalized to always contain every field.
     llvm::sys::path::append(inferredSysRoot, D.Dir, "..", D.getTargetTriple());
@@ -194,7 +197,7 @@ std::string BareMetal::computeSysRoot() const {
 
 std::string BareMetal::getCompilerRTPath() const {
   const Driver &D = getDriver();
-  if (IsGCCInstallationValid || detectGCCToolchainAdjacent(getDriver())) {
+  if (IsGCCInstallationValid || IsGCCToolchainAdjacent) {
     SmallString<128> Path(D.ResourceDir);
     llvm::sys::path::append(Path, "lib");
     return std::string(Path.str());
@@ -219,6 +222,7 @@ BareMetal::BareMetal(const Driver &D, const llvm::Triple &Triple,
                      const ArgList &Args)
     : Generic_ELF(D, Triple, Args) {
   IsGCCInstallationValid = initGCCInstallation(Triple, Args);
+  IsGCCToolchainAdjacent = detectGCCToolchainAdjacent(D, Args);
   std::string ComputedSysRoot = computeSysRoot();
   if (IsGCCInstallationValid) {
     if (!isRISCVBareMetal(Triple))
@@ -340,7 +344,7 @@ void BareMetal::findMultilibs(const Driver &D, const llvm::Triple &Triple,
     Multilibs = Result.Multilibs;
     MultilibMacroDefines.append(CustomFlagMacroDefines.begin(),
                                 CustomFlagMacroDefines.end());
-  } else if (isRISCVBareMetal(Triple) && !detectGCCToolchainAdjacent(D)) {
+  } else if (isRISCVBareMetal(Triple) && !IsGCCToolchainAdjacent) {
     if (findRISCVMultilibs(D, Triple, Args, Result)) {
       SelectedMultilibs = Result.SelectedMultilibs;
       Multilibs = Result.Multilibs;
@@ -599,7 +603,7 @@ void baremetal::Linker::ConstructJob(Compilation &C, const JobAction &JA,
         crt = "rcrt1.o";
       CmdArgs.push_back(Args.MakeArgString(TC.GetFilePath(crt)));
     }
-    if (TC.hasValidGCCInstallation() || detectGCCToolchainAdjacent(D)) {
+    if (TC.hasValidGCCInstallation() || TC.isGCCToolchainAdjacent()) {
       auto RuntimeLib = TC.GetRuntimeLibType(Args);
       switch (RuntimeLib) {
       case (ToolChain::RLT_Libgcc): {
@@ -650,13 +654,12 @@ void baremetal::Linker::ConstructJob(Compilation &C, const JobAction &JA,
     AddRunTimeLibs(TC, D, CmdArgs, Args);
     if (!Args.hasArg(options::OPT_nolibc))
       CmdArgs.push_back("-lc");
-    if (TC.hasValidGCCInstallation() || detectGCCToolchainAdjacent(D))
+    if (TC.hasValidGCCInstallation() || TC.isGCCToolchainAdjacent())
       CmdArgs.push_back("-lgloss");
     CmdArgs.push_back("--end-group");
   }
 
-  if ((TC.hasValidGCCInstallation() || detectGCCToolchainAdjacent(D)) &&
-      NeedCRTs)
+  if ((TC.hasValidGCCInstallation() || TC.isGCCToolchainAdjacent()) && NeedCRTs)
     CmdArgs.push_back(Args.MakeArgString(TC.GetFilePath(CRTEnd)));
 
   // The R_ARM_TARGET2 relocation must be treated as R_ARM_REL32 on arm*-*-elf
