@@ -382,3 +382,6 @@ if(CMAKE_EXPORT_COMPILE_COMMANDS AND NOT ("${LLVM_BINARY_DIR}" STREQUAL "${CMAKE
                      DEPENDS ${CMAKE_BINARY_DIR}/compile_commands.json)
   add_custom_target(merge_runtime_commands ALL DEPENDS ${LLVM_BINARY_DIR}/compile_commands.json)
 endif()
+
+# HACK from llvm_project_base_commit.py:
+# <<< Gentoo configuration >>>

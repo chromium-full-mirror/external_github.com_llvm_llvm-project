@@ -869,3 +869,6 @@ if(COMPILER_RT_INCLUDE_TESTS)
 endif()
 
 add_subdirectory(tools)
+
+# HACK from llvm_project_base_commit.py:
+# <<< Gentoo configuration >>>
