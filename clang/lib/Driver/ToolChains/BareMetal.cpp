@@ -464,37 +464,6 @@ void BareMetal::AddClangCXXStdlibIncludeArgs(const ArgList &DriverArgs,
   const Driver &D = getDriver();
   StringRef Target = getTripleString();
 
-  auto AddCXXIncludePath = [&](StringRef Path) {
-    std::string Version = detectLibcxxVersion(Path);
-    if (Version.empty())
-      return;
-
-    {
-      // First the per-target include dir: include/<target>/c++/v1.
-      SmallString<128> TargetDir(Path);
-      llvm::sys::path::append(TargetDir, Target, "c++", Version);
-      addSystemInclude(DriverArgs, CC1Args, TargetDir);
-    }
-
-    {
-      // Then the generic dir: include/c++/v1.
-      SmallString<128> Dir(Path);
-      llvm::sys::path::append(Dir, "c++", Version);
-      addSystemInclude(DriverArgs, CC1Args, Dir);
-    }
-  };
-
-  switch (GetCXXStdlibType(DriverArgs)) {
-  case ToolChain::CST_Libcxx: {
-    SmallString<128> P(D.Dir);
-    llvm::sys::path::append(P, "..", "include");
-    AddCXXIncludePath(P);
-    break;
-  }
-  case ToolChain::CST_Libstdcxx:
-    addLibStdCxxIncludePaths(DriverArgs, CC1Args);
-    break;
-  }
 
   std::string SysRootDir(computeSysRoot());
   if (SysRootDir.empty())
