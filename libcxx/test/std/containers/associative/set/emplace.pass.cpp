@@ -91,6 +91,22 @@ int main(int, char**) {
     assert(std::get<1>(res));
     assert(set.begin() == std::get<0>(res));
   }
+  { // Regression test for https://llvm.org/PR220451.
+    // Make sure emplace with multiple arguments doesn't extract the first argument as a key for sets.
+    struct S {
+      const int val;
+      explicit S(int v) : val(v) {}
+      S(const S& s, int offset) : val(s.val + offset) {}
+      bool operator<(const S& other) const { return val < other.val; }
+      bool operator==(const S& other) const { return val == other.val; }
+    };
+    std::set<S> s;
+    s.emplace(2);
+    auto res = s.emplace(S(1), 1);
+    assert(!res.second);
+    assert(s.size() == 1);
+    assert(s.begin()->val == 2);
+  }
 
   return 0;
 }
