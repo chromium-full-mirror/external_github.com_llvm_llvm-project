@@ -6376,6 +6376,8 @@ def o : JoinedOrSeparate<["-"], "o">,
   Visibility<[ClangOption, CC1Option, CC1AsOption, FC1Option, FlangOption]>,
   HelpText<"Write output to <file>">, MetaVarName<"<file>">,
   MarshallingInfoString<FrontendOpts<"OutputFile">>;
+def fexperimental_gccadjacent : Flag <["-"], "fexperimental-gccadjacent">,
+  Group<f_Group>, HelpText<"Experimental flag to auto-detect adding GCC runtimes for baremetal">;
 def object_file_name_EQ : Joined<["-"], "object-file-name=">,
   Visibility<[ClangOption, CC1Option, CC1AsOption, CLOption, DXCOption]>,
   HelpText<"Set the output <file> for debug infos">, MetaVarName<"<file>">,
