@@ -517,7 +517,7 @@ set(thumb1_base_SOURCES
   arm/addsf3.S
   ${GENERIC_SOURCES}
 )
-set_special_properties(arm/adddf3.S SUPERSEDES subdf3.c PROVIDES subdf3)
+set_special_properties(arm/adddf3.S SUPERSEDES subdf3.c arm/aeabi_drsub.c PROVIDES subdf3 aeabi_drsub)
 
 if(COMPILER_RT_ARM_OPTIMIZED_FP)
   set(thumb1_base_SOURCES
