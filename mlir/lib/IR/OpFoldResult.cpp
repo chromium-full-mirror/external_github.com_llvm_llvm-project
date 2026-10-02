@@ -9,6 +9,7 @@
 #include "mlir/IR/OpFoldResult.h"
 #include "mlir/IR/Diagnostics.h"
 #include "mlir/IR/Operation.h"
+#include "mlir/IR/RegionKindInterface.h"
 #include "llvm/Support/raw_ostream.h"
 
 using namespace mlir;
@@ -148,4 +149,21 @@ OpFoldResults detail::convertLegacyFoldResults(LogicalResult status,
              [](OpFoldResult result) { return static_cast<bool>(result); }) &&
          "legacy fold returned a null result");
   return results;
+}
+
+void detail::dropReplacementsOfReplacedResults(Operation *op,
+                                               OpFoldResults &result) {
+  bool namesReplacedResult =
+      llvm::any_of(result.getReplacements(), [&](OpFoldResult replacement) {
+        auto opResult = dyn_cast_if_present<OpResult>(
+            dyn_cast_if_present<Value>(replacement));
+        return opResult && opResult.getOwner() == op &&
+               result[opResult.getResultNumber()];
+      });
+  if (!namesReplacedResult)
+    return;
+  assert(op->getParentRegion() && mayBeGraphRegion(*op->getParentRegion()) &&
+         "fold result names a result of the folded operation that the same "
+         "fold replaces");
+  result = success(result.modifiedInPlace());
 }
