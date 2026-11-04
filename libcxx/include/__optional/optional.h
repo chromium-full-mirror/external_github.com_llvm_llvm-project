@@ -55,6 +55,7 @@
 #include <__utility/in_place.h>
 #include <__utility/move.h>
 #include <initializer_list>
+#include <stdio.h>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
 #  pragma GCC system_header
@@ -517,30 +518,54 @@ public:
   // [optional.observe]
   [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr const _Tp& operator*() const& noexcept {
     _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(this->has_value(), "optional operator* called on a disengaged value");
+    if (!this->has_value()) {
+      fprintf(stderr, "optional operator* called on a disengaged value\n");
+      __builtin_trap();
+    }
     return this->__val_;
   }
 
   [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr _Tp& operator*() & noexcept {
     _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(this->has_value(), "optional operator* called on a disengaged value");
+    if (!this->has_value()) {
+      fprintf(stderr, "optional operator* called on a disengaged value\n");
+      __builtin_trap();
+    }
     return this->__val_;
   }
 
   [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr _Tp&& operator*() && noexcept {
     _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(this->has_value(), "optional operator* called on a disengaged value");
+    if (!this->has_value()) {
+      fprintf(stderr, "optional operator* called on a disengaged value\n");
+      __builtin_trap();
+    }
     return std::move(this->__val_);
   }
 
   [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr const _Tp&& operator*() const&& noexcept {
     _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(this->has_value(), "optional operator* called on a disengaged value");
+    if (!this->has_value()) {
+      fprintf(stderr, "optional operator* called on a disengaged value\n");
+      __builtin_trap();
+    }
     return std::move(this->__val_);
   }
   _LIBCPP_HIDE_FROM_ABI constexpr add_pointer_t<_Tp const> operator->() const noexcept {
     _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(this->has_value(), "optional operator-> called on a disengaged value");
+    if (!this->has_value()) {
+      fprintf(stderr, "optional operator-> called on a disengaged value\n");
+      __builtin_trap();
+    }
     return std::addressof(this->__val_);
   }
 
   _LIBCPP_HIDE_FROM_ABI constexpr add_pointer_t<_Tp> operator->() noexcept {
     _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(this->has_value(), "optional operator-> called on a disengaged value");
+    if (!this->has_value()) {
+      fprintf(stderr, "optional operator-> called on a disengaged value\n");
+      __builtin_trap();
+    }
     return std::addressof(this->__val_);
   }
 

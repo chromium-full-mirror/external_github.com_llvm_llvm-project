@@ -40,6 +40,7 @@
 #include <__utility/in_place.h>
 #include <__utility/move.h>
 #include <__utility/swap.h>
+#include <stdio.h>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
 #  pragma GCC system_header
@@ -212,11 +213,19 @@ public:
   // [optional.ref.observe]
   _LIBCPP_HIDE_FROM_ABI constexpr add_pointer_t<_Tp> operator->() const noexcept {
     _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(this->has_value(), "optional operator-> called on a disengaged value");
+    if (!this->has_value()) {
+      fprintf(stderr, "optional operator-> called on a disengaged value\n");
+      __builtin_trap();
+    }
     return __value_;
   }
 
   [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr _Tp& operator*() const noexcept {
     _LIBCPP_ASSERT_VALID_ELEMENT_ACCESS(this->has_value(), "optional operator* called on a disengaged value");
+    if (!this->has_value()) {
+      fprintf(stderr, "optional operator* called on a disengaged value\n");
+      __builtin_trap();
+    }
     return *__value_;
   }
 
