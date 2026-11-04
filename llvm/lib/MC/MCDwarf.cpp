@@ -1891,7 +1891,8 @@ static unsigned getCIEVersion(bool IsEH, unsigned DwarfVersion) {
   case 4:
   case 5:
   case 6:
-    return 4;
+    return 1;
+    //    return 4;  Temporarily disable as workaround for Breakpad issue
   }
   llvm_unreachable("Unknown version");
 }
