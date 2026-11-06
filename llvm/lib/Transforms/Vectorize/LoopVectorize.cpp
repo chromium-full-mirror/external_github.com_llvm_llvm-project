@@ -4886,6 +4886,22 @@ LoopVectorizationCostModel::getInstructionCost(Instruction *I,
     return getVectorCallCost(cast<CallInst>(I), VF);
   case Instruction::ExtractValue:
     return TTI.getInstructionCost(I, Config.CostKind);
+  case Instruction::BitInsert:
+  case Instruction::BitExtract: {
+    // The offset is the last operand. The value type is the source of a
+    // bitextract, and the inserted value of a bitinsert.
+    Value *Offset = I->getOperand(I->getNumOperands() - 1);
+    auto OffsetInfo = TTI.getOperandInfo(Offset);
+    if (OffsetInfo.Kind == TargetTransformInfo::OK_AnyValue &&
+        shouldConsiderInvariant(Offset))
+      OffsetInfo.Kind = TargetTransformInfo::OK_UniformValue;
+    Type *ScalarOpTy = I->getOperand(I->getNumOperands() - 2)->getType();
+    Type *OpTy =
+        VectorTy->isVectorTy() ? toVectorTy(ScalarOpTy, VF) : ScalarOpTy;
+    if (isa<BitInsertInst>(I))
+      return TTI.getBitInsertCost(VectorTy, OpTy, OffsetInfo, Config.CostKind);
+    return TTI.getBitExtractCost(VectorTy, OpTy, OffsetInfo, Config.CostKind);
+  }
   case Instruction::Alloca:
     // We cannot easily widen alloca to a scalable alloca, as
     // the result would need to be a vector of pointers.
@@ -5902,6 +5918,8 @@ VPRecipeWithIRFlags *VPRecipeBuilder::tryToWiden(VPInstruction *VPI) {
   case Instruction::Xor:
   case Instruction::Freeze:
   case Instruction::ExtractValue:
+  case Instruction::BitInsert:
+  case Instruction::BitExtract:
     return new VPWidenRecipe(*I, VPI->operandsWithoutMask(), *VPI, *VPI,
                              VPI->getDebugLoc());
   };
