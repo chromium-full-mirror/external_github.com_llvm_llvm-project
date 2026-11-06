@@ -3,12 +3,12 @@
 
 define void @bitinsert_scalable(<vscale x 8 x b16> %nxv8b16, <vscale x 4 x b32> %nxv4b32, <vscale x 2 x b64> %nxv2b64, <vscale x 8 x i8> %nxv8i8, <vscale x 4 x i8> %nxv4i8, <vscale x 2 x float> %nxv2f32, <vscale x 8 x i32> %nxv8off, <vscale x 4 x i32> %nxv4off, <vscale x 2 x i32> %nxv2off) {
 ; CHECK-LABEL: 'bitinsert_scalable'
-; CHECK-NEXT:  Cost Model: Found costs of 1 for: %nxv8b16.nxv8i8 = bitinsert <vscale x 8 x b16> %nxv8b16, <vscale x 8 x i8> %nxv8i8, <vscale x 8 x i32> splat (i32 8)
-; CHECK-NEXT:  Cost Model: Found costs of 1 for: %nxv8b16.nxv8i8.var = bitinsert <vscale x 8 x b16> %nxv8b16, <vscale x 8 x i8> %nxv8i8, <vscale x 8 x i32> %nxv8off
-; CHECK-NEXT:  Cost Model: Found costs of 1 for: %nxv4b32.nxv4i8 = bitinsert <vscale x 4 x b32> %nxv4b32, <vscale x 4 x i8> %nxv4i8, <vscale x 4 x i32> splat (i32 8)
-; CHECK-NEXT:  Cost Model: Found costs of 1 for: %nxv4b32.nxv4i8.var = bitinsert <vscale x 4 x b32> %nxv4b32, <vscale x 4 x i8> %nxv4i8, <vscale x 4 x i32> %nxv4off
-; CHECK-NEXT:  Cost Model: Found costs of 1 for: %nxv2b64.nxv2f32 = bitinsert <vscale x 2 x b64> %nxv2b64, <vscale x 2 x float> %nxv2f32, <vscale x 2 x i32> splat (i32 32)
-; CHECK-NEXT:  Cost Model: Found costs of 1 for: %nxv2b64.nxv2f32.var = bitinsert <vscale x 2 x b64> %nxv2b64, <vscale x 2 x float> %nxv2f32, <vscale x 2 x i32> %nxv2off
+; CHECK-NEXT:  Cost Model: Found costs of 4 for: %nxv8b16.nxv8i8 = bitinsert <vscale x 8 x b16> %nxv8b16, <vscale x 8 x i8> %nxv8i8, <vscale x 8 x i32> splat (i32 8)
+; CHECK-NEXT:  Cost Model: Found costs of 7 for: %nxv8b16.nxv8i8.var = bitinsert <vscale x 8 x b16> %nxv8b16, <vscale x 8 x i8> %nxv8i8, <vscale x 8 x i32> %nxv8off
+; CHECK-NEXT:  Cost Model: Found costs of 4 for: %nxv4b32.nxv4i8 = bitinsert <vscale x 4 x b32> %nxv4b32, <vscale x 4 x i8> %nxv4i8, <vscale x 4 x i32> splat (i32 8)
+; CHECK-NEXT:  Cost Model: Found costs of 6 for: %nxv4b32.nxv4i8.var = bitinsert <vscale x 4 x b32> %nxv4b32, <vscale x 4 x i8> %nxv4i8, <vscale x 4 x i32> %nxv4off
+; CHECK-NEXT:  Cost Model: Found costs of 4 for: %nxv2b64.nxv2f32 = bitinsert <vscale x 2 x b64> %nxv2b64, <vscale x 2 x float> %nxv2f32, <vscale x 2 x i32> splat (i32 32)
+; CHECK-NEXT:  Cost Model: Found costs of 7 for: %nxv2b64.nxv2f32.var = bitinsert <vscale x 2 x b64> %nxv2b64, <vscale x 2 x float> %nxv2f32, <vscale x 2 x i32> %nxv2off
 ; CHECK-NEXT:  Cost Model: Found costs of RThru:0 CodeSize:1 Lat:1 SizeLat:1 for: ret void
 ;
   %nxv8b16.nxv8i8 = bitinsert <vscale x 8 x b16> %nxv8b16, <vscale x 8 x i8> %nxv8i8, <vscale x 8 x i32> splat (i32 8)

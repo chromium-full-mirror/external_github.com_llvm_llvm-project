@@ -185,6 +185,21 @@ private:
     return Cost;
   }
 
+  /// Estimate the cost of casting the offset of a bitinsert or bitextract on
+  /// \p IntTy to the shift amount type.
+  InstructionCost getBitOffsetCastOverhead(Type *IntTy,
+                                           TTI::OperandValueInfo OffsetInfo,
+                                           TTI::TargetCostKind CostKind) const {
+    // The i32 offset needs a zext or a trunc to the shift type.
+    unsigned BitWidth = IntTy->getScalarSizeInBits();
+    if (!IntTy->isVectorTy() || BitWidth == 32 || OffsetInfo.isConstant() ||
+        OffsetInfo.isUniform())
+      return 0;
+    return thisT()->getCastInstrCost(
+        BitWidth > 32 ? Instruction::ZExt : Instruction::Trunc, IntTy,
+        IntTy->getWithNewBitWidth(32), TTI::CastContextHint::None, CostKind);
+  }
+
   /// Local query method delegates up to T which *must* implement this!
   const TargetSubtargetInfo *getST() const {
     return static_cast<const T *>(this)->getST();
@@ -1574,6 +1589,52 @@ public:
                                               /*Insert*/ true,
                                               /*Extract*/ false, CostKind);
 
+    return Cost;
+  }
+
+  InstructionCost
+  getBitInsertCost(Type *Base, Type *Val, TTI::OperandValueInfo OffsetInfo,
+                   TTI::TargetCostKind CostKind) const override {
+    // A bitinsert is lowered to an and that clears the bit range of the base,
+    // and an or with the value, after a zext and a shl to the offset.
+    const DataLayout &DL = this->getDataLayout();
+    Type *IntTy = Type::getIntFromByteType(Base);
+    Type *IntValTy = IntTy->getWithNewBitWidth(
+        DL.getTypeSizeInBits(Val->getScalarType()).getFixedValue());
+    InstructionCost Cost =
+        thisT()->getArithmeticInstrCost(Instruction::And, IntTy, CostKind) +
+        thisT()->getArithmeticInstrCost(Instruction::Shl, IntTy, CostKind, {},
+                                        OffsetInfo) +
+        thisT()->getArithmeticInstrCost(Instruction::Or, IntTy, CostKind) +
+        getBitOffsetCastOverhead(IntTy, OffsetInfo, CostKind);
+    if (IntValTy != IntTy)
+      Cost += thisT()->getCastInstrCost(Instruction::ZExt, IntTy, IntValTy,
+                                        TTI::CastContextHint::None, CostKind);
+    // With a variable offset, the mask also needs a shl and a xor.
+    if (!OffsetInfo.isConstant())
+      Cost +=
+          thisT()->getArithmeticInstrCost(Instruction::Shl, IntTy, CostKind, {},
+                                          OffsetInfo) +
+          thisT()->getArithmeticInstrCost(Instruction::Xor, IntTy, CostKind);
+    return Cost;
+  }
+
+  InstructionCost
+  getBitExtractCost(Type *Dst, Type *Src, TTI::OperandValueInfo OffsetInfo,
+                    TTI::TargetCostKind CostKind) const override {
+    // A bitextract is lowered to an lshr of the source, as an integer, and a
+    // trunc to the width of the result.
+    const DataLayout &DL = this->getDataLayout();
+    Type *IntSrcTy = Type::getIntFromByteType(Src);
+    Type *IntTy = IntSrcTy->getWithNewBitWidth(
+        DL.getTypeSizeInBits(Dst->getScalarType()).getFixedValue());
+    InstructionCost Cost =
+        thisT()->getArithmeticInstrCost(Instruction::LShr, IntSrcTy, CostKind,
+                                        {}, OffsetInfo) +
+        getBitOffsetCastOverhead(IntSrcTy, OffsetInfo, CostKind);
+    if (IntTy != IntSrcTy)
+      Cost += thisT()->getCastInstrCost(Instruction::Trunc, IntTy, IntSrcTy,
+                                        TTI::CastContextHint::None, CostKind);
     return Cost;
   }
 

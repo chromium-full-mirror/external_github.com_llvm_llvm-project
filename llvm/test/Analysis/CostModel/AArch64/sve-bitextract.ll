@@ -4,11 +4,11 @@
 define void @bitextract_scalable(<vscale x 8 x b16> %nxv8b16, <vscale x 4 x b32> %nxv4b32, <vscale x 2 x b64> %nxv2b64, <vscale x 8 x i32> %nxv8off, <vscale x 4 x i32> %nxv4off, <vscale x 2 x i32> %nxv2off) {
 ; CHECK-LABEL: 'bitextract_scalable'
 ; CHECK-NEXT:  Cost Model: Found costs of 1 for: %nxv8i8.nxv8b16 = bitextract <vscale x 8 x i8>, <vscale x 8 x b16> %nxv8b16, <vscale x 8 x i32> splat (i32 8)
-; CHECK-NEXT:  Cost Model: Found costs of 1 for: %nxv8i8.nxv8b16.var = bitextract <vscale x 8 x i8>, <vscale x 8 x b16> %nxv8b16, <vscale x 8 x i32> %nxv8off
+; CHECK-NEXT:  Cost Model: Found costs of 2 for: %nxv8i8.nxv8b16.var = bitextract <vscale x 8 x i8>, <vscale x 8 x b16> %nxv8b16, <vscale x 8 x i32> %nxv8off
 ; CHECK-NEXT:  Cost Model: Found costs of 1 for: %nxv4i8.nxv4b32 = bitextract <vscale x 4 x i8>, <vscale x 4 x b32> %nxv4b32, <vscale x 4 x i32> splat (i32 8)
 ; CHECK-NEXT:  Cost Model: Found costs of 1 for: %nxv4i8.nxv4b32.var = bitextract <vscale x 4 x i8>, <vscale x 4 x b32> %nxv4b32, <vscale x 4 x i32> %nxv4off
 ; CHECK-NEXT:  Cost Model: Found costs of 1 for: %nxv2f32.nxv2b64 = bitextract <vscale x 2 x float>, <vscale x 2 x b64> %nxv2b64, <vscale x 2 x i32> splat (i32 32)
-; CHECK-NEXT:  Cost Model: Found costs of 1 for: %nxv2f32.nxv2b64.var = bitextract <vscale x 2 x float>, <vscale x 2 x b64> %nxv2b64, <vscale x 2 x i32> %nxv2off
+; CHECK-NEXT:  Cost Model: Found costs of 2 for: %nxv2f32.nxv2b64.var = bitextract <vscale x 2 x float>, <vscale x 2 x b64> %nxv2b64, <vscale x 2 x i32> %nxv2off
 ; CHECK-NEXT:  Cost Model: Found costs of RThru:0 CodeSize:1 Lat:1 SizeLat:1 for: ret void
 ;
   %nxv8i8.nxv8b16 = bitextract <vscale x 8 x i8>, <vscale x 8 x b16> %nxv8b16, <vscale x 8 x i32> splat (i32 8)
